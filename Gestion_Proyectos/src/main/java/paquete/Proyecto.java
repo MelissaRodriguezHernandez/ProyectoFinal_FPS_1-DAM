@@ -133,7 +133,30 @@ public class Proyecto {
     /*Otros metodos*/
 
    
+    /**
+     *Se asigna aleatoriamente un identificador al proyecto.
+     * hay que tener en cuenta que no se repita con alguno existente
+     * @throws ClassNotFoundException
+     */
+    public static String asignarId() throws ClassNotFoundException{
+        int min = 0;
+        int max = 9999;
+        ArrayList<Proyecto> listaProyectos = BBDD.recuperarProyectos();
 
+        String id = String.valueOf((int) Math.floor(Math.random() * (max - min + 1) + min));
+
+        int i = 0;
+
+        while(i<listaProyectos.size()) {
+            if(listaProyectos.get(i).getId().equals(id)) {
+                i = 0;
+                id = String.valueOf((int) Math.floor(Math.random() * (max - min + 1) + min));
+            }else {
+                i++;
+            }
+        }
+        return id;
+    }
     
 
    
