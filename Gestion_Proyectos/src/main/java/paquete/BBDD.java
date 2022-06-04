@@ -424,7 +424,145 @@ public class BBDD {
 	            e.printStackTrace();
 	        }
 	    }
+	    
+	    /**
+	     *Metodo para cojer toda la información de todas las tareas de un proyecto en la base de datos
+	     *Retornara un String con la información incrustada en un html, 
+	     *el cual se enviara a la página web
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static String infoTarea() throws ClassNotFoundException, SQLException {
+	        String resultado = "";
 
+	        String query = "SELECT nombre, estado, fechaEntrega FROM tarea WHERE idProyecto='"+BBDD.idProyectoActual+"'" ;
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+	        resultado = "<h5> Tareas </h5> <h6> | Nombre | Estado | Fecha entrega |<h6>";
+
+	        while(rs.next()) {
+	            resultado = resultado + "<h6>"+rs.getString("nombre")+" : "+rs.getString("estado")+ " : " + rs.getString("fechaEntrega")+"</h6>";
+	        }
+
+	        return resultado;
+	    }
+
+	    /**
+	     *Metodo para cojer toda la información de todos los participantes de un proyecto en la base de datos
+	     *Retornara un String con la información incrustada en un html, 
+	     *el cual se enviara a la página web
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static String infoParticipante() throws ClassNotFoundException, SQLException {
+	        String resultado = "";
+
+	        String query = "SELECT gp.idUsuario, u.nombre FROM grupo_participantes gp JOIN usuario u ON gp.idUsuario = u.id WHERE gp.idProyecto='"+BBDD.idProyectoActual+"'" ;
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+	        resultado = "<h5> Partcipantes </h5> <h6> | ID | Nombre | <h6>";
+
+	        while(rs.next()) {
+	            resultado = resultado + "<h6>"+rs.getString("idUsuario")+" : "+rs.getString("nombre")+ "</h6>";
+	        }
+
+	        return resultado;
+	    }
+
+	    /**
+	     *Metodo para cojer toda la información de todas las fases de un proyecto en la base de datos
+	     *Retornara un String con la información incrustada en un html, 
+	     *el cual se enviara a la página web
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static String infoFase() throws ClassNotFoundException, SQLException {
+	        String resultado = "";
+
+	        String query = "SELECT nombre, estado, fecha_final FROM fase WHERE idProyecto='"+BBDD.idProyectoActual+"'" ;
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+	        resultado = "<h5> Fases </h5> <h6> | Nombre | Estado | Fecha terminio <h6>";
+
+	        while(rs.next()) {
+	            resultado = resultado + "<h6>"+rs.getString("nombre")+" : "+rs.getString("estado")+" : "+rs.getString("fecha_final")+"</h6>";
+	        }
+
+	        return resultado;
+	    }
+	    
+	    /**
+	     *Metodo que cojera la información de las fases y tareas donde partcicpa el usuario logueado
+	     *por cada fase llamara al metodo infoTareaUsuario, al cual se le mandara por parametro la fase para obetener
+	     *cada tarea que tiene endiente el usuario en esa fase
+	     *El metodo devuele un String que contiene toda la  información incrustada en un html que se enviara a la página web
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static String infoTareasUsuario() throws ClassNotFoundException, SQLException {
+	        String resultado = "";
+
+	        String query = "SELECT gpf.idFase, f.nombre FROM grupo_participantes_fase gpf JOIN fase f ON gpf.idFase = f.id WHERE f.idProyecto='"+BBDD.idProyectoActual+"' AND idUsuario='"+BBDD.usuarioWeb+"'" ;
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+	        while(rs.next()) {
+
+	            resultado = resultado + "<button class=\"fase_drop\" onmouseover=\"drop()\">"+rs.getString("nombre")+"<i class=\"icon icon-angle-double-down\"></i></button>\r\n"
+	                    + "                            <ul class=\"tareas_drop\">"+BBDD.infoTareaFaseUsuario(rs.getString("idFase"))+"</ul>";
+
+
+	        }
+	        return resultado;
+	    }
+
+	    /**
+	     *Metodo que a traves de un id de fase pasado por parametro devuelve todas las tareas que tiene 
+	     *el usuario actual pendiente en la fase
+	     *Devuelve un String de la infromación con html incrustado
+	     * @param idFase
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static String infoTareaFaseUsuario(String idFase) throws ClassNotFoundException, SQLException {
+	        String resultado = "";
+
+
+	        String query = "SELECT idTarea ,nombre, fechaEntrega FROM tarea WHERE idProyecto='"+BBDD.idProyectoActual+"' AND idFase='"+idFase+"' AND idUsuario='"+BBDD.usuarioWeb+"' " ;
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+	        while(rs.next()) {
+	            resultado = resultado + "<h4>"+rs.getString("nombre")+" | entrega : "+rs.getString("fechaEntrega")+"<i class=\"icon icon-square-o\" onclick=\"actualizarEstado("+rs.getString("idTarea")+", "+idFase+")\"></i></h4>";
+	        }
+
+	        return resultado;
+	    }
+
+	  
 
 	
 }
