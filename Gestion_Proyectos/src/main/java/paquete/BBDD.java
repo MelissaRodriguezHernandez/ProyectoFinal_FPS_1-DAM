@@ -215,6 +215,216 @@ public class BBDD {
 	        }
 	        return resultado;
 	    }
+	    
+	    /**
+	     *Seleccionamos toda la información en la base de datos del proyecto seleccionado para luego incrustarlo en un html 
+	     *este metodo devolvera un String que contendra el html que se enviara de vuelta a la página web
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static String cargarInfoProyecto() throws ClassNotFoundException, SQLException {
+	        String resultado = "";
+	        String id = idProyectoActual;
+
+	        String query = "SELECT id, nombre, tipo, estado , descripcion, fechaInicio, fechaFinal FROM proyecto  WHERE id='"+id+"'";
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+
+	        while(rs.next()) {
+	            resultado = resultado + "<div><h3>Id | <h2>"+rs.getString("id")+"</h2></h3><br><br>"
+	                    +"<h3>Nombre | <h2>"+rs.getString("nombre")+"</h2></h3><br><br>"
+	                    +"<h3>Tipo | <h2>"+rs.getString("tipo")+"</h2></h3><br><br>"
+	                    +"<h3>Estado | <h2>"+rs.getString("estado")+"</h2></h3><br><br></div>"
+	                    +"<div><h3>Descripción | <h2>"+rs.getString("descripcion")+"</h2></h3><br><br>"
+	                    +"<h3>Fecha de inicio | <h2>"+rs.getString("fechaInicio")+"</h2></h3><br><br>"
+	                    +"<h3>Fecha de terminio | <h2>"+rs.getString("fechaFinal")+"</h2></h3><br><br></div>"
+	                    +"<div><i class=\"icon icon-pie-chart\" id=\"icon\"></i></div>";
+	        }
+	        return resultado;
+	    }
+
+	    
+	    /**
+	     *Metodo que insertara un nuevo proyecto en la base de datos con toda la información pasada por parametro
+	     * @param id
+	     * @param nombre
+	     * @param idDirector
+	     * @param descripcion
+	     * @param tipo
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static void insertProyecto(String id, String nombre, String idDirector, String descripcion, String tipo, String fechaI, String fechaF) throws ClassNotFoundException, SQLException {
+
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        String query = "INSERT INTO proyecto (id, nombre, descripcion, tipo, idDirector, fechaInicio, fechaFinal) VALUES ('"+id+"','"+nombre+"','"+descripcion+"','"+tipo+"','"+idDirector+"','"+fechaI+"','"+fechaF+"')";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        try {
+	            st.executeUpdate(query);
+	        } catch (SQLException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+
+	    /**
+	     *Metodo que añadira una fase a la base de datos con la información pasada por parametro
+	     *el id del proyecto será el del abierto por el usuario
+	     *La fase se añade dentro de un proyecto ya creado
+	     *Cada vez que elegimos y abrimos un proyecto cogemos el id del proyecto y lo almacenamos en atributo estatico
+	     *para luego utilizarlo en otros metodos
+	     * @param idProyecto
+	     * @param nombre
+	     * @param descripcion
+	     * @param estado
+	     * @param importancia
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static void insertFase( String nombre, String descripcion, String importancia, String fechaI, String fechaF) throws ClassNotFoundException, SQLException {
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        String query = "INSERT INTO fase (idProyecto, nombre, descripcion, importancia, fecha_inicio, fecha_final) VALUES ('"+BBDD.idProyectoActual+"','"+nombre+"','"+descripcion+"','"+importancia+"','"+fechaI+"','"+fechaF+"')";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        try {
+	            st.executeUpdate(query);
+	        } catch (SQLException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+
+	    /**
+	     *Metodo que añadira un usuario (el id se pasa por parametro) a la tabla de grupo de los participantes en el proyecto
+	     *Otra vez el id del proyecto se coje del atributo estatico
+	     * @param idUsuario
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static void insertParticipanteProyecto(String idUsuario) throws ClassNotFoundException, SQLException {
+
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        String query = "INSERT INTO grupo_participantes VALUES ('"+BBDD.idProyectoActual+"','"+idUsuario+"')";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        try {
+	            st.executeUpdate(query);
+	        } catch (SQLException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+
+	    /**
+	     *Se pasa por parametro el id del usuario y el de la fase para luego insertar un nuevo participante en la tabla de
+	     * grupo de participantes por fase en el proyecto
+	     * Otra vez el id del proyecto se coje del atributo estatico
+	     * @param idUsuario
+	     * @param idFase
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static void insertParticipanteFase(String idUsuario, String idFase) throws ClassNotFoundException, SQLException {
+
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        String query = "INSERT INTO grupo_participantes_fase VALUES ('"+BBDD.idProyectoActual+"','"+idUsuario+"','"+idFase+"')";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        try {
+	            st.executeUpdate(query);
+	        } catch (SQLException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    /**
+	     * Este metodo carga todas las fases de un proyecto para mostrarlas 
+	     * en los formularios de añadir tareas 
+	     * Otra vez el id del proyecto se coje del atributo estatico
+	     * devolvera un String con el html que se incrustara en la página web
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static String cargarFasesForm() throws ClassNotFoundException, SQLException {
+	        String resultado = "";
+
+	        String query = "SELECT id, nombre FROM fase WHERE idProyecto='"+BBDD.idProyectoActual+"'" ;
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+	        while(rs.next()) {
+	            resultado = resultado + "<option value= \""+rs.getString("id")+"\">"+rs.getString("nombre")+"</option>";
+	        }
+
+	        return resultado;
+	    }
+	    
+	   /**
+	    *  Este metodo carga todas los participantes de un proyecto para mostrarlos 
+	     * en los formularios de añadir tareas
+	     * Otra vez el id del proyecto se coje del atributo estatico
+	     * devolvera un String con el html que se incrustara en la página web
+	    * @return
+	    * @throws ClassNotFoundException
+	    * @throws SQLException
+	    */
+	    public static String inforParticipanteForm() throws ClassNotFoundException, SQLException {
+	        String resultado = "";
+
+	        String query = "SELECT idUsuario FROM grupo_participantes WHERE idProyecto='"+BBDD.idProyectoActual+"' AND idUsuario IS NOT NULL" ;
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        ResultSet rs= st.executeQuery(query);
+
+	        while(rs.next()) {
+	            resultado = resultado + "<option value= \""+rs.getString("idUsuario")+"\">"+rs.getString("idUsuario")+"</option>";
+	        }
+
+	        return resultado;
+	    }
+
+	    /**
+	     *Metodo que añadira una tarea nueva a la base de datos con toda la informaacion pasada por parametro
+	     *Otra vez el id del proyecto se coje del atributo estatico
+	     * @param idFase
+	     * @param nombre
+	     * @param descripcion
+	     * @param idUsuario
+	     * @param fecha
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static void insertTarea( int idFase, String nombre, String descripcion, String idUsuario, String fecha) throws ClassNotFoundException, SQLException {
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        String query = "INSERT INTO tarea(idFase, idProyecto, nombre, descripcion, idUsuario, fechaEntrega) VALUES ('"+idFase+"','"+BBDD.idProyectoActual+"','"+nombre+"','"+descripcion+"','"+idUsuario+"','"+fecha+"')";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        try {
+	            st.executeUpdate(query);
+	        } catch (SQLException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+
 
 	
 }
