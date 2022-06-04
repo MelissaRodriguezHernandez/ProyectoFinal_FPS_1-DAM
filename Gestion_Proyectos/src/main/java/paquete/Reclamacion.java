@@ -85,6 +85,31 @@ public class Reclamacion {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+    
+    /**
+     * Se asigna aleatoriamente un identificador a la reclamacion
+     *  hay que tener en cuenta que no se repita con alguno existente
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public static String asignarId() throws ClassNotFoundException, SQLException {
+        int min = 0;
+        int max = 9999;
+        ArrayList<Reclamacion> listaReclamaciones = BBDD.listaReclamacion();
+        String id = String.valueOf((int) Math.floor(Math.random() * (max - min + 1) + min));
+
+        int i = 0;
+
+        while(i<listaReclamaciones.size()) {
+            if(listaReclamaciones.get(i).getId().equals(id)) {
+                i = 0;
+                id = String.valueOf((int) Math.floor(Math.random() * (max - min + 1) + min));
+            }else {
+                i++;
+            }
+        }
+        return id;
+    }
 	
 
 }

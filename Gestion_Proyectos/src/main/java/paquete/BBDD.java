@@ -561,7 +561,70 @@ public class BBDD {
 
 	        return resultado;
 	    }
+	    
+	    /**
+	     *Metodo que inserta en la base de datos una reclamacion hecha por el usuario logueado
+	     * @param id
+	     * @param titulo
+	     * @param tipo
+	     * @param idProyecto
+	     * @param descripcion
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static void infoReclamacion(String id, String titulo, String tipo, String descripcion) throws ClassNotFoundException, SQLException {
 
+	        Class.forName("com.mysql.cj.jdbc.Driver");
+	        String url = "jdbc:mysql://localhost:3306/proyecto";
+	        String query = "INSERT INTO reclamacion (id, nombre, descripcion, idUsuario_re) VALUES ('"+id+"','"+titulo+"','"+descripcion+"','"+usuarioWeb+"')";
+	        Connection con = DriverManager.getConnection(url, "root", "mysql");
+	        Statement st = con.createStatement();
+	        try {
+	            st.executeUpdate(query);
+	        } catch (SQLException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+
+	    /**
+	     *Metodo que selecciona todas las filas de la tabla reclamacion de la base de datos, fila por fila
+	     * va creando un nuevo objeto reclamacion con la información y lo mete en un arraylist de reclamaciones.
+	     * Resumidamente metemos en un arraylist todas las reclamaciones de la base de datos para usarla posteriormente en otros metodos
+	     * @return
+	     * @throws ClassNotFoundException
+	     * @throws SQLException
+	     */
+	    public static ArrayList<Reclamacion> listaReclamacion() throws ClassNotFoundException, SQLException{
+
+	        ArrayList<Reclamacion> listaReclamaciones = new ArrayList<>();
+
+	        try {
+
+	            String query = "SELECT * FROM reclamacion";
+	            Class.forName("com.mysql.cj.jdbc.Driver");
+	            String url = "jdbc:mysql://localhost:3306/proyecto";
+	            Connection con = DriverManager.getConnection(url, "root", "mysql");
+	            Statement st = con.createStatement();
+	            ResultSet rs= st.executeQuery(query);
+
+	            while (rs.next()) {
+
+	                String id= rs.getString("id");
+	                String idProyecto= rs.getString("idProyecto_re");
+	                String nombre = rs.getString("nombre");
+	                String descripcion = rs.getString("descripcion");
+	                String idUsuario = rs.getString("idUsuario_re");
+	                String estado = rs.getString("estado");
+
+	                listaReclamaciones.add(new Reclamacion(id, idProyecto, nombre, descripcion, idUsuario, estado));
+
+	            }
+	        }catch(SQLException e) {
+	            System.out.println("Error al recuperar las reclamaciones");
+	        }
+	        return listaReclamaciones;
+	    }
 	  
 
 	
