@@ -2,6 +2,14 @@
 
 > Proyecto final con tema de Gestión de proyectos. El backend del proyecto esta basado en Java y el frontend en HTML, CSS Y JS.
 
+## Fronted
+
+La página web se ejecutará en un servidor web nginx
+
+## Backend
+
+El backend del proyecto se ejecuta sobre un servidor Tomcat virtualizado en un contenedor de Docker
+
 ## Versionado semántico
 
 - 0.0.1  : Creación de clases y definición de atributos
